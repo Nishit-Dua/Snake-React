@@ -13,6 +13,7 @@ const initialState = {
 const App: React.FC = () => {
   const [state, setState] = useState<StateType>(initialState);
   const [gameRunning, setGameRunning] = useState(true);
+  const [score, setScore] = useState(1);
 
   const [snake, setSnake] = useState<SnakeType>([{ col: 0, row: 0 }]);
 
@@ -61,7 +62,7 @@ const App: React.FC = () => {
   };
 
   const finishGame = () => {
-    alert(`Game Over, Your score was ${snake.length}`);
+    alert(`Game Over, Your score was ${score}`);
     setGameRunning(false);
     setState(initialState);
   };
@@ -76,7 +77,6 @@ const App: React.FC = () => {
     ) {
       finishGame();
     }
-    // TODO add game ending on body colision
     for (let snakeBodyPart of snake.slice(0, snake.length - 1)) {
       if (
         snakeHead.col === snakeBodyPart.col &&
@@ -88,6 +88,10 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    setScore(snake.length);
+  }, [snake.length]);
+
+  useEffect(() => {
     checkGameOver();
     const gameInterval = setInterval(() => {
       let newSnake = [...snake];
@@ -96,27 +100,22 @@ const App: React.FC = () => {
         case "right":
           if (state.prevDirection !== "left")
             newSnake.push({ col: snakeHead.col + 1, row: snakeHead.row });
-          // console.log("right?");
           break;
         case "left":
           if (state.prevDirection !== "right")
             newSnake.push({ col: snakeHead.col - 1, row: snakeHead.row });
-          // console.log("left?");
           break;
         case "up":
           if (state.prevDirection !== "down")
             newSnake.push({ col: snakeHead.col, row: snakeHead.row - 1 });
-          // console.log("up?");
           break;
         case "down":
           if (state.prevDirection !== "up")
             newSnake.push({ col: snakeHead.col, row: snakeHead.row + 1 });
-          // console.log("down?");
           break;
         default:
           break;
       }
-      // console.count(JSON.stringify(newSnake));
       if (state.currentDirection) {
         if (!isFood(snakeHead)) {
           newSnake.shift();
@@ -143,7 +142,6 @@ const App: React.FC = () => {
   useEffect(() => {
     const { currentDirection } = state;
     const keyPressFxn = (e: KeyboardEvent) => {
-      // console.log(currentDirection);
       switch (e.key) {
         case "ArrowDown":
           if (currentDirection !== "down" && currentDirection !== "up") {
@@ -199,24 +197,27 @@ const App: React.FC = () => {
   }, [state]);
 
   return (
-    <div className="grid" style={GridCss}>
-      {state.grid.map((gridItem) => {
-        let classAssign = "grid-box";
-        if (isFood(gridItem) && isSnake(gridItem)) {
-          classAssign = "eating-box";
-        } else if (isFood(gridItem)) {
-          classAssign = "food-box";
-        } else if (isSnake(gridItem)) {
-          classAssign = "snake-box";
-        }
-        return (
-          <div
-            className={`box ${classAssign}`}
-            key={`${gridItem.row}-${gridItem.col}`}
-          ></div>
-        );
-      })}
-    </div>
+    <>
+      <h2>Current Score: {score} </h2>
+      <div className="grid" style={GridCss}>
+        {state.grid.map((gridItem) => {
+          let classAssign = "grid-box";
+          if (isFood(gridItem) && isSnake(gridItem)) {
+            classAssign = "eating-box";
+          } else if (isFood(gridItem)) {
+            classAssign = "food-box";
+          } else if (isSnake(gridItem)) {
+            classAssign = "snake-box";
+          }
+          return (
+            <div
+              className={`box ${classAssign}`}
+              key={`${gridItem.row}-${gridItem.col}`}
+            ></div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

@@ -1,8 +1,6 @@
 import React from "react";
 
-interface GridProps {}
-
-export const Grid: React.FC<GridProps> = ({}) => {
+export const Grid: React.FC = () => {
   const grid = [];
   for (let index = 0; index < 100; index++) {
     grid.push(<div className="grid-box" key={index}></div>);
